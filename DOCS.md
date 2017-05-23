@@ -38,7 +38,7 @@ deploy:
     environment_variables:
       - DATABASE_URI=$$MY_DATABASE_URI
     port_mappings:
-      - 80 9000
+      - host=80,container=9000
     memoryReservation: 128
     cpu: 1024
     desired_count: 1

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -30,6 +31,25 @@ type Plugin struct {
 	Memory                  int64
 	MemoryReservation       int64
 	YamlVerified            bool
+	Discreet                bool
+}
+
+func parsePortMap(str string) (map[string]int64, error) {
+	components := strings.Split(strings.Trim(str, " "), ",")
+	m := make(map[string]int64)
+	for _, element := range components {
+		parts := strings.SplitN(element, "=", 2)
+		if len(parts) < 2 {
+			return nil, errors.New(fmt.Sprintf("malformed map expression: '%s'", element))
+		}
+		port, err := strconv.ParseInt(parts[1], 10, 64)
+		m[parts[0]] = port
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("port number should be an integer: '%s'", element))
+		}
+	}
+
+	return m, nil
 }
 
 func (p *Plugin) Exec() error {
@@ -88,23 +108,25 @@ func (p *Plugin) Exec() error {
 
 	// Port mappings
 	for _, portMapping := range p.PortMappings {
-		cleanedPortMapping := strings.Trim(portMapping, " ")
-		parts := strings.SplitN(cleanedPortMapping, " ", 2)
-		hostPort, hostPortErr := strconv.ParseInt(parts[0], 10, 64)
-		if hostPortErr != nil {
-			fmt.Println(hostPortErr.Error())
-			return hostPortErr
-		}
-		containerPort, containerPortError := strconv.ParseInt(parts[1], 10, 64)
-		if containerPortError != nil {
-			fmt.Println(containerPortError.Error())
-			return containerPortError
+		parsedMappings, portMappingParseErr := parsePortMap(portMapping)
+		if portMappingParseErr != nil {
+			fmt.Println(portMappingParseErr.Error())
+			return portMappingParseErr
 		}
 
 		pair := ecs.PortMapping{
-			ContainerPort: aws.Int64(containerPort),
-			HostPort:      aws.Int64(hostPort),
-			Protocol:      aws.String("TransportProtocol"),
+			Protocol: aws.String("TransportProtocol"),
+		}
+
+		for key, value := range parsedMappings {
+			switch key {
+			case "container":
+				pair.ContainerPort = aws.Int64(value)
+			case "host":
+				pair.HostPort = aws.Int64(value)
+			default:
+				fmt.Println(fmt.Sprintf("WARNING: invalid portmapping key '%s'", key))
+			}
 		}
 
 		definition.PortMappings = append(definition.PortMappings, &pair)
@@ -170,9 +192,11 @@ func (p *Plugin) Exec() error {
 		return serr
 	}
 
-	fmt.Println(sresp)
+	if !p.Discreet {
+		fmt.Println(sresp)
+		fmt.Println(resp)
+	}
 
-	fmt.Println(resp)
 	return nil
 
 }

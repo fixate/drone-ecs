@@ -106,6 +106,11 @@ func main() {
 			Usage:  "Ensure the yaml was signed",
 			EnvVar: "DRONE_YAML_VERIFIED",
 		},
+		cli.BoolTFlag{
+			Name:   "discreet",
+			Usage:  "If true, don't output the result of the api call in the logs",
+			EnvVar: "PLUGIN_DISCREET",
+		},
 	}
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
@@ -132,6 +137,7 @@ func run(c *cli.Context) error {
 		DeploymentConfiguration: c.String("deployment-configuration"),
 		DesiredCount:            c.Int64("desired-count"),
 		YamlVerified:            c.BoolT("yaml-verified"),
+		Discreet:                c.BoolT("discreet"),
 	}
 	return plugin.Exec()
 }
