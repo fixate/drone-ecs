@@ -32,6 +32,7 @@ type Plugin struct {
 	MemoryReservation       int64
 	YamlVerified            bool
 	Discreet                bool
+	NoServiceUpdate         bool
 }
 
 func parsePortMap(str string) (map[string]int64, error) {
@@ -152,6 +153,11 @@ func (p *Plugin) Exec() error {
 
 	if err != nil {
 		return err
+	}
+
+	if p.NoServiceUpdate {
+		fmt.Println("no-service-update flag is true. Not updating service to new task definition.")
+		return nil
 	}
 
 	val := *(resp.TaskDefinition.TaskDefinitionArn)

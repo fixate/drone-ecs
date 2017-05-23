@@ -106,6 +106,11 @@ func main() {
 			Usage:  "Ensure the yaml was signed",
 			EnvVar: "DRONE_YAML_VERIFIED",
 		},
+		cli.BoolFlag{
+			Name:   "no-service-update",
+			Usage:  "If true, the service will not be updated with the new task definition",
+			EnvVar: "PLUGIN_NO_SERVICE_UPDATE",
+		},
 		cli.BoolTFlag{
 			Name:   "discreet",
 			Usage:  "If true, don't output the result of the api call in the logs",
@@ -138,6 +143,7 @@ func run(c *cli.Context) error {
 		DesiredCount:            c.Int64("desired-count"),
 		YamlVerified:            c.BoolT("yaml-verified"),
 		Discreet:                c.BoolT("discreet"),
+		NoServiceUpdate:         c.BoolT("no-service-update"),
 	}
 	return plugin.Exec()
 }
