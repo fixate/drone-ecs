@@ -10,8 +10,8 @@ var version string
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "rancher publish"
-	app.Usage = "rancher publish"
+	app.Name = "ECS publish"
+	app.Usage = "ECS publish"
 	app.Action = run
 	app.Version = version
 	app.Flags = []cli.Flag{

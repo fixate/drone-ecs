@@ -53,7 +53,7 @@ func parsePortMap(str string) (map[string]int64, error) {
 }
 
 func (p *Plugin) Exec() error {
-	fmt.Println("Drone AWS ECS Plugin built")
+	fmt.Println("Starting Drone AWS ECS deployment")
 	awsConfig := aws.Config{}
 
 	if len(p.Key) != 0 && len(p.Secret) != 0 {
@@ -110,7 +110,6 @@ func (p *Plugin) Exec() error {
 	for _, portMapping := range p.PortMappings {
 		parsedMappings, portMappingParseErr := parsePortMap(portMapping)
 		if portMappingParseErr != nil {
-			fmt.Println(portMappingParseErr.Error())
 			return portMappingParseErr
 		}
 
@@ -152,7 +151,6 @@ func (p *Plugin) Exec() error {
 	resp, err := svc.RegisterTaskDefinition(params)
 
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 
@@ -167,28 +165,27 @@ func (p *Plugin) Exec() error {
 		sparams.DesiredCount = aws.Int64(p.DesiredCount)
 	}
 
-	cleanedDeploymentConfiguration := strings.Trim(p.DeploymentConfiguration, " ")
-	parts := strings.SplitN(cleanedDeploymentConfiguration, " ", 2)
-	minimumHealthyPercent, minimumHealthyPercentError := strconv.ParseInt(parts[0], 10, 64)
-	if minimumHealthyPercentError != nil {
-		fmt.Println(minimumHealthyPercentError.Error())
-		return minimumHealthyPercentError
-	}
-	maximumPercent, maximumPercentErr := strconv.ParseInt(parts[1], 10, 64)
-	if maximumPercentErr != nil {
-		fmt.Println(maximumPercentErr.Error())
-		return maximumPercentErr
-	}
+	if len(p.DeploymentConfiguration) != 0 {
+		cleanedDeploymentConfiguration := strings.Trim(p.DeploymentConfiguration, " ")
+		parts := strings.SplitN(cleanedDeploymentConfiguration, " ", 2)
+		minimumHealthyPercent, minimumHealthyPercentError := strconv.ParseInt(parts[0], 10, 64)
+		if minimumHealthyPercentError != nil {
+			return minimumHealthyPercentError
+		}
+		maximumPercent, maximumPercentErr := strconv.ParseInt(parts[1], 10, 64)
+		if maximumPercentErr != nil {
+			return maximumPercentErr
+		}
 
-	sparams.DeploymentConfiguration = &ecs.DeploymentConfiguration{
-		MaximumPercent:        aws.Int64(maximumPercent),
-		MinimumHealthyPercent: aws.Int64(minimumHealthyPercent),
+		sparams.DeploymentConfiguration = &ecs.DeploymentConfiguration{
+			MaximumPercent:        aws.Int64(maximumPercent),
+			MinimumHealthyPercent: aws.Int64(minimumHealthyPercent),
+		}
 	}
 
 	sresp, serr := svc.UpdateService(sparams)
 
 	if serr != nil {
-		fmt.Println(serr.Error())
 		return serr
 	}
 
