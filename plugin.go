@@ -153,7 +153,7 @@ func (p *Plugin) Exec() error {
 		TaskRoleArn: aws.String(p.TaskRoleArn),
 	}
 
-	fmt.Println("Registring task definition...")
+	fmt.Print("Registring task definition...")
 	resp, err := svc.RegisterTaskDefinition(params)
 
 	if err != nil {
@@ -196,7 +196,7 @@ func (p *Plugin) Exec() error {
 		}
 	}
 
-	fmt.Sprintf("Updating service %s\n", p.Service)
+	fmt.Printf("Updating service %s\n", p.Service)
 	sresp, serr := svc.UpdateService(sparams)
 
 	if serr != nil {
