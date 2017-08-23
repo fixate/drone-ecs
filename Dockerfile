@@ -3,7 +3,7 @@
 #     cd $GOPATH/src/github.com/drone-plugins/drone-ecs
 #     make deps build docker
 
-FROM alpine:3.2
+FROM alpine:3.6
 
 # RUN apk update && apk add --no-cache bash gawk sed grep bc coreutils
 RUN apk update && \
