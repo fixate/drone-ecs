@@ -55,10 +55,13 @@ func parsePortMap(str string) (map[string]int64, error) {
 
 func (p *Plugin) Exec() error {
 	fmt.Println("Starting Drone AWS ECS deployment")
+	defer fmt.Println("Drone AWS ECS plugin finished.")
 	awsConfig := aws.Config{}
 
 	if len(p.Key) != 0 && len(p.Secret) != 0 {
 		awsConfig.Credentials = credentials.NewStaticCredentials(p.Key, p.Secret, "")
+	} else {
+		fmt.Println("No AWS credentials provided")
 	}
 	awsConfig.Region = aws.String(p.Region)
 	svc := ecs.New(session.New(&awsConfig))
