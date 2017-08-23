@@ -1,7 +1,7 @@
 .PHONY: all clean deps fmt vet test docker buildstatic
 
 EXECUTABLE ?= drone-ecs
-IMAGE ?= fixate/$(EXECUTABLE)
+IMAGE ?= fixate/$(EXECUTABLE):latest
 COMMIT ?= $(shell git rev-parse --short HEAD)
 
 LDFLAGS = -X "main.buildCommit=$(COMMIT)"

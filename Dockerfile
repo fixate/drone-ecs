@@ -13,4 +13,5 @@ RUN apk update && \
 
 ADD drone-ecs /bin/
 
-ENTRYPOINT ["/bin/drone-ecs"]
+#ENTRYPOINT ["/bin/drone-ecs"]
+ENTRYPOINT ["/usr/bin/env"]
