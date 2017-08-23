@@ -12,5 +12,7 @@ RUN apk update && \
   rm -rf /var/cache/apk/*
 
 ADD drone-ecs /bin/
+ADD test.sh /bin/
 
-ENTRYPOINT ["/bin/drone-ecs"]
+#ENTRYPOINT ["/bin/drone-ecs"]
+ENTRYPOINT ["/bin/test.sh"]
