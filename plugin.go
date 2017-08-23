@@ -196,6 +196,7 @@ func (p *Plugin) Exec() error {
 		}
 	}
 
+	fmt.Sprintf("Updating service %s\n", p.Service)
 	sresp, serr := svc.UpdateService(sparams)
 
 	if serr != nil {
