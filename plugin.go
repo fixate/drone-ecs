@@ -152,11 +152,15 @@ func (p *Plugin) Exec() error {
 		Volumes:     []*ecs.Volume{},
 		TaskRoleArn: aws.String(p.TaskRoleArn),
 	}
+
+	fmt.Println("Registring task definition...")
 	resp, err := svc.RegisterTaskDefinition(params)
 
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("Done")
 
 	if p.NoServiceUpdate {
 		fmt.Println("no-service-update flag is true. Not updating service to new task definition.")

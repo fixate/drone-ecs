@@ -1,4 +1,4 @@
-.PHONY: all clean deps fmt vet test docker
+.PHONY: all clean deps fmt vet test docker buildstatic
 
 EXECUTABLE ?= drone-ecs
 IMAGE ?= fixate/$(EXECUTABLE)
@@ -24,8 +24,10 @@ vet:
 test:
 	@for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
 
-docker:
+buildstatic:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags '-s -w $(LDFLAGS)'
+
+docker: buildstatic
 	docker build --rm -t $(IMAGE) .
 
 $(EXECUTABLE): $(wildcard *.go)
