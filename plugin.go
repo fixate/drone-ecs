@@ -25,14 +25,14 @@ type Plugin struct {
 	Cluster                 string
 	DeploymentConfiguration string
 	PortMappings            []string
-	Environment             []string
-	DesiredCount            int64
-	CPU                     int64
-	Memory                  int64
-	MemoryReservation       int64
-	YamlVerified            bool
-	Discreet                bool
-	NoServiceUpdate         bool
+	//Environment             []string
+	DesiredCount      int64
+	CPU               int64
+	Memory            int64
+	MemoryReservation int64
+	YamlVerified      bool
+	Discreet          bool
+	NoServiceUpdate   bool
 }
 
 func parsePortMap(str string) (map[string]int64, error) {
@@ -79,9 +79,9 @@ func (p *Plugin) Exec() error {
 		DockerLabels:          map[string]*string{},
 		DockerSecurityOptions: []*string{},
 		EntryPoint:            []*string{},
-		Environment:           []*ecs.KeyValuePair{},
-		Essential:             aws.Bool(true),
-		ExtraHosts:            []*ecs.HostEntry{},
+		//Environment:           []*ecs.KeyValuePair{},
+		Essential:  aws.Bool(true),
+		ExtraHosts: []*ecs.HostEntry{},
 
 		Image:        aws.String(Image),
 		Links:        []*string{},
@@ -136,14 +136,15 @@ func (p *Plugin) Exec() error {
 	}
 
 	// Environment variables
-	for _, envVar := range p.Environment {
-		parts := strings.SplitN(envVar, "=", 2)
-		pair := ecs.KeyValuePair{
-			Name:  aws.String(strings.Trim(parts[0], " ")),
-			Value: aws.String(strings.Trim(parts[1], " ")),
-		}
-		definition.Environment = append(definition.Environment, &pair)
-	}
+	//for _, envVar := range p.Environment {
+	//parts := strings.SplitN(envVar, "=", 2)
+	//pair := ecs.KeyValuePair{
+	//Name:  aws.String(strings.Trim(parts[0], " ")),
+	//Value: aws.String(strings.Trim(parts[1], " ")),
+	//}
+	//definition.Environment = append(definition.Environment, &pair)
+	//}
+
 	params := &ecs.RegisterTaskDefinitionInput{
 		ContainerDefinitions: []*ecs.ContainerDefinition{
 			&definition,
